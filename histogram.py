@@ -29,7 +29,7 @@ def standardize_array(array,
 
 
 def draw_merged_histogram(standardized: dict):
-    """Draw histogram for each feature in the standardized data matrix.
+    """Draw merged histogram from each feature in the standardized data matrix.
 
     Parameters:
       standardized (dict): Standardized data matrix.

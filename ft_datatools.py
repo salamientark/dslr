@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def get_numerical_features(df: pd.DataFrame) -> list:
-    """Get the numerical features only from a dataframe.
+    """Get the numerical features name only from a dataframe.
 
     Parameters:
       df (pd.DataFrame): Dataframe.
