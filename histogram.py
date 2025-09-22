@@ -45,6 +45,31 @@ def draw_merged_histogram(standardized: dict):
     plt.show()
 
 
+def draw_unique_histogram(standardized: dict):
+    """Draw unique histogram for each feature in the standardized data matrix.
+
+    Parameters:
+      standardized (dict): Standardized data matrix.
+    """
+    fig, axes = plt.subplots(4, 4, figsize=(12, 12))
+    fig.subplots_adjust(hspace=0.5, wspace=0.5, left=0.1, right=0.9,
+                        top=0.95, bottom=0.05)
+    i, j = 0, 0
+    for feature, data in standardized.items():
+        axes[i, j].hist(data, bins=30, alpha=0.5, label=feature)
+        axes[i, j].set_title(f"{feature} repartition")
+        j += 1
+        if j == 4:
+            j = 0
+            i += 1
+    while j < 4:
+        axes[i, j].set_visible(False)
+        j += 1
+    manager = plt.get_current_fig_manager()
+    manager.full_screen_toggle()
+    plt.show()
+
+
 def main(ac: int, av: list):
     """Describe the dataset given as parameter.
 
@@ -62,6 +87,7 @@ def main(ac: int, av: list):
             col = ftdt.filter_col(df[feature].tolist())
             standardized[feature] = standardize_array(col)
         draw_merged_histogram(standardized)
+        draw_unique_histogram(standardized)
         plt.show()
     except Exception as e:
         print(f"Error: {e}")
