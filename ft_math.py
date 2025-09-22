@@ -1,3 +1,20 @@
+import pandas as pd
+
+
+def ft_isnbr(elem) -> bool:
+    """Check if an element is a number (int or float).
+
+    Parameters:
+      elem: Element to check.
+
+    Returns:
+      bool: True if the element is a number, False otherwise.
+    """
+    if isinstance(elem, (int, float)) and not pd.isna(elem):
+        return True
+    return False
+
+
 def ft_mean(
         array,
         count: int | None = None
@@ -12,11 +29,12 @@ def ft_mean(
     Returns:
       float: Mean of the list of numbers.
     """
-    if count is None:
-        count = len(array)
+    c = count
+    if c is None:
+        c = len(array)
     mean = 0
-    for i in range(count):
-        mean += (1 / count) * array[i]
+    for i in range(c):
+        mean += (1. / float(c)) * array[i]
     return mean
 
 
@@ -29,7 +47,7 @@ def ft_variance(
 
     Parameters:
       array (list): List of numbers.
-      mean (float) (optional): Mean of the list of numbers. If None, it will 
+      mean (float) (optional): Mean of the list of numbers. If None, it will
                                be computed.
       count (int) (optionnal): Number of elements in the list. If None, it
                                will be computed.
@@ -37,13 +55,15 @@ def ft_variance(
     Returns:
       float: Variance of the list of numbers.
     """
-    if mean is None:
-        mean = ft_mean(array)
-    if count is None:
-        count = len(array)
+    c = count
+    m = mean
+    if m is None:
+        m = ft_mean(array)
+    if c is None:
+        c = len(array)
     var = 0
-    for i in range(count):
-        var += (1 / count) * (array[i] - mean) ** 2
+    for i in range(c):
+        var += (1. / float(c)) * (array[i] - m) ** 2
     return var
 
 
@@ -63,19 +83,21 @@ def ft_std(
     Returns:
       float: Standard deviation of the list of numbers.
     """
-    if count is None:
-        count = len(array)
-    if var is None:
-        var = ft_variance(array, count=count)
-    return var ** 0.5
-    
+    c = count
+    v = var
+    if c is None:
+        c = len(array)
+    if v is None:
+        v = ft_variance(array, count=c)
+    return v ** 0.5
 
-def ft_min(array) ->int | float:
+
+def ft_min(array) -> int | float:
     """Return the minimum of a list of numbers.
 
     Parameters:
       array (list): List of numbers.
-    
+
     Returns:
       int | float: Minimum of the list of numbers.
     """
@@ -83,12 +105,12 @@ def ft_min(array) ->int | float:
     return sorted_array[0]
 
 
-def ft_max(array) ->int | float:
+def ft_max(array) -> int | float:
     """Return the maximum of a list of numbers.
 
     Parameters:
       array (list): List of numbers.
-    
+
     Returns:
       int | float: Maximum of the list of numbers.
     """
@@ -106,10 +128,11 @@ def ft_q1(array, count: int | None = None) -> int | float:
     Returns:
       int | float: First quartile of the list of numbers.
     """
-    if count is None:
-        count = len(array)
+    c = count
+    if c is None:
+        c = len(array)
     sorted_array = sorted(array)
-    return sorted_array[count // 4]
+    return sorted_array[c // 4]
 
 
 def ft_q2(array, count: int | None = None) -> int | float:
@@ -122,10 +145,11 @@ def ft_q2(array, count: int | None = None) -> int | float:
     Returns:
       int | float: Second quartile of the list of numbers.
     """
-    if count is None:
-        count = len(array)
+    c = count
+    if c is None:
+        c = len(array)
     sorted_array = sorted(array)
-    return sorted_array[count // 2]
+    return sorted_array[c // 2]
 
 
 def ft_q3(array, count: int | None = None) -> int | float:
@@ -138,7 +162,8 @@ def ft_q3(array, count: int | None = None) -> int | float:
     Returns:
       int | float: Third quartile of the list of numbers.
     """
-    if count is None:
-        count = len(array)
+    c = count
+    if c is None:
+        c = len(array)
     sorted_array = sorted(array)
-    return sorted_array[(count // 4) * 3]
+    return sorted_array[(c // 4) * 3]
