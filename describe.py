@@ -110,7 +110,6 @@ def main(ac: int, av: list):
             size = len(col)
             counts.append(size)
             means.append(ftm.ft_mean(col, count=size))
-            # break
             stds.append(ftm.ft_std(col, count=size))
             mins.append(ftm.ft_min(col))
             q1s.append(ftm.ft_q1(col, count=size))
