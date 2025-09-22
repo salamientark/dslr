@@ -1,49 +1,7 @@
 import sys
 import pandas as pd
 import ft_math as ftm
-
-
-def get_numerical_features(df: pd.DataFrame) -> list:
-    """Get the numerical features only from a dataframe.
-
-    Parameters:
-      df (pd.DataFrame): Dataframe.
-
-    Returns:
-      list: List of numerical features.
-    """
-    columns = df.columns.tolist()
-    filtered_features = []
-    for col in columns:
-        if (col == 'Index'):
-            continue
-        for elem in df[col].tolist():
-            if elem is None or pd.isna(elem):
-                continue
-            if isinstance(elem, (int, float)):
-                filtered_features.append(col)
-            break
-    return filtered_features
-
-
-def filter_col(col: list) -> list:
-    """Filter a column to keep only numerical values.
-
-    Parameters:
-      col (list): Column to filter.
-
-    Returns:
-      list: Filtered column.
-    """
-    i = 0
-    lim = len(col)
-    while i < lim:
-        if col[i] is None or pd.isna(col[i]):
-            del col[i]
-            lim -= 1
-            continue
-        i += 1
-    return col
+import ft_datatools as ftdt
 
 
 def print_result(
@@ -144,11 +102,11 @@ def main(ac: int, av: list):
         if (ac != 2):
             raise Exception("Usage: describe.py <dataset_path>")
         df = pd.read_csv(av[1])  # Dataframe
-        features = get_numerical_features(df)
+        features = ftdt.get_numerical_features(df)
         counts, means, stds, mins, q1s, q2s = [], [], [], [], [], []
         q3s, maxs = [], []
         for feature in features:
-            col = filter_col(df[feature].tolist())
+            col = ftdt.filter_col(df[feature].tolist())
             size = len(col)
             counts.append(size)
             means.append(ftm.ft_mean(col, count=size))
