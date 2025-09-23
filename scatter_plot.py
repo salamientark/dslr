@@ -1,0 +1,102 @@
+import sys
+import pandas as pd
+import ft_math as ftm
+import ft_datatools as ftdt
+from matplotlib import pyplot as plt
+
+
+def standardize_array(array,
+                      mean: float | None = None,
+                      std: float | None = None
+                      ) -> list:
+    """Standardize a list of numerical values.
+
+    Parameters:
+    array (list): List of numerical values.
+    mean (float | None): Mean of the list. If None, it will be computed.
+    std (float | None): Standard deviation of the list. If None, it will be
+        computed.
+
+    Returns:
+    list: Standardized list.
+    """
+    standardized = []
+    m = mean if mean is not None else ftm.ft_mean(array)
+    s = std if std is not None else ftm.ft_std(array)
+    for elem in array:
+        standardized.append((elem - m) / s if s != 0 else 0)
+    return standardized
+
+
+def draw_scatter_plot(standardized: dict):
+    """Draw unique histogram for each feature in the standardized data matrix.
+
+    Parameters:
+      standardized (dict): Standardized data matrix.
+    """
+    for feature, data in standardized.items():
+        if feature == "Defense Against the Dark Arts" or feature == "Divination" or feature == "History of Magic" or feature == "Herbology":
+                plt.scatter(range(len(data)), data, alpha=0.5, label=feature)
+    plt.title(f"Scatter plot of features")
+    plt.legend(loc='upper right')
+    plt.xlabel("Index")
+    plt.ylabel("Standardized value")
+    manager = plt.get_current_fig_manager()
+    manager.full_screen_toggle()
+    plt.ylim(-10, 10)
+    plt.show()
+
+
+def draw_unique_scatter_plot(standardized: dict):
+    """Draw unique histogram for each feature in the standardized data matrix.
+
+    Parameters:
+      standardized (dict): Standardized data matrix.
+    """
+    fig, axes = plt.subplots(6, 13, figsize=(12, 12))
+    fig.subplots_adjust(hspace=0.5, wspace=0.5, left=0.1, right=0.9,
+                        top=0.95, bottom=0.05)
+    x, y = 0, 0
+    keys = list(standardized.keys())
+    for i_f, f1 in enumerate(keys):
+        data1 = standardized[f1]
+        for j_f in range(i_f + 1, len(keys)):
+            f2 = keys[j_f]
+            data2 = standardized[keys[j_f]]
+            axes[x, y].scatter(data1, data2, alpha=0.5)
+            y += 1
+            if y == 13:
+                y = 0
+                x += 1
+    # plt.ylim(-100, 100)
+    manager = plt.get_current_fig_manager()
+    manager.full_screen_toggle()
+    plt.show()
+
+
+def main(ac: int, av: list):
+    """Describe the dataset given as parameter.
+
+    Parameters:
+      ac (int): Number of command line arguments.
+      av (list): List of command line arguments.
+    """
+    try:
+        if (ac != 2):
+            raise Exception("Usage: describe.py <dataset_path>")
+        df = pd.read_csv(av[1])  # Dataframe
+        features = ftdt.get_numerical_features(df)
+        standardized = {}  # Standardized data matrix
+        for feature in features:
+            col = df[feature].tolist()
+            # col = ftdt.filter_col(df[feature].tolist())
+            standardized[feature] = col
+        draw_unique_scatter_plot(standardized)
+        draw_scatter_plot(standardized)
+        plt.show()
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+if __name__ == "__main__":
+    main(len(sys.argv), sys.argv)
