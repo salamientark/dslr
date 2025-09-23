@@ -35,9 +35,8 @@ def draw_scatter_plot(standardized: dict):
       standardized (dict): Standardized data matrix.
     """
     for feature, data in standardized.items():
-        if feature == "Defense Against the Dark Arts" or feature == "Divination" or feature == "History of Magic" or feature == "Herbology":
-                plt.scatter(range(len(data)), data, alpha=0.5, label=feature)
-    plt.title(f"Scatter plot of features")
+        plt.scatter(range(len(data)), data, alpha=0.5, label=feature)
+    plt.title("Scatter plot of features")
     plt.legend(loc='upper right')
     plt.xlabel("Index")
     plt.ylabel("Standardized value")
@@ -53,10 +52,10 @@ def draw_unique_scatter_plot(standardized: dict):
     Parameters:
       standardized (dict): Standardized data matrix.
     """
-    fig, axes = plt.subplots(6, 13, figsize=(12, 12))
-    fig.subplots_adjust(hspace=0.5, wspace=0.5, left=0.1, right=0.9,
-                        top=0.95, bottom=0.05)
-    x, y = 0, 0
+    fig, axes = plt.subplots(4, 5, figsize=(12, 12))
+    fig.subplots_adjust(hspace=0.7, wspace=0.7, left=0.07,
+                        right=0.93, top=0.95, bottom=0.1)
+    x, y, count = 0, 0, 0
     keys = list(standardized.keys())
     for i_f, f1 in enumerate(keys):
         data1 = standardized[f1]
@@ -64,11 +63,24 @@ def draw_unique_scatter_plot(standardized: dict):
             f2 = keys[j_f]
             data2 = standardized[keys[j_f]]
             axes[x, y].scatter(data1, data2, alpha=0.5)
+            axes[x, y].set_xlabel(f1, fontsize=8)
+            axes[x, y].set_ylabel(f2, fontsize=8)
             y += 1
-            if y == 13:
+            count += 1
+            if y == 5:
                 y = 0
                 x += 1
-    # plt.ylim(-100, 100)
+            if count == 20:
+                manager = plt.get_current_fig_manager()
+                manager.full_screen_toggle()
+                plt.show()
+                fig, axes = plt.subplots(4, 5, figsize=(12, 12))
+                fig.subplots_adjust(hspace=0.7, wspace=0.7, left=0.07,
+                                    right=0.93, top=0.95, bottom=0.1)
+                x, y, count = 0, 0, 0
+    while y < 5:
+        axes[x, y].set_visible(False)
+        y += 1
     manager = plt.get_current_fig_manager()
     manager.full_screen_toggle()
     plt.show()
@@ -89,10 +101,8 @@ def main(ac: int, av: list):
         standardized = {}  # Standardized data matrix
         for feature in features:
             col = df[feature].tolist()
-            # col = ftdt.filter_col(df[feature].tolist())
             standardized[feature] = col
         draw_unique_scatter_plot(standardized)
-        draw_scatter_plot(standardized)
         plt.show()
     except Exception as e:
         print(f"Error: {e}")
