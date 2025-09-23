@@ -1,31 +1,7 @@
 import sys
 import pandas as pd
-import ft_math as ftm
 import ft_datatools as ftdt
 from matplotlib import pyplot as plt
-
-
-def standardize_array(array,
-                      mean: float | None = None,
-                      std: float | None = None
-                      ) -> list:
-    """Standardize a list of numerical values.
-
-    Parameters:
-    array (list): List of numerical values.
-    mean (float | None): Mean of the list. If None, it will be computed.
-    std (float | None): Standard deviation of the list. If None, it will be
-        computed.
-
-    Returns:
-    list: Standardized list.
-    """
-    standardized = []
-    m = mean if mean is not None else ftm.ft_mean(array)
-    s = std if std is not None else ftm.ft_std(array)
-    for elem in array:
-        standardized.append((elem - m) / s if s != 0 else 0)
-    return standardized
 
 
 def draw_scatter_plot(standardized: dict):
@@ -98,11 +74,11 @@ def main(ac: int, av: list):
             raise Exception("Usage: describe.py <dataset_path>")
         df = pd.read_csv(av[1])  # Dataframe
         features = ftdt.get_numerical_features(df)
-        standardized = {}  # Standardized data matrix
+        matrix = {}
         for feature in features:
             col = df[feature].tolist()
-            standardized[feature] = col
-        draw_unique_scatter_plot(standardized)
+            matrix[feature] = col
+        draw_unique_scatter_plot(matrix)
         plt.show()
     except Exception as e:
         print(f"Error: {e}")
