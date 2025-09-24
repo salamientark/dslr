@@ -34,8 +34,12 @@ def draw_merged_histogram(standardized: dict):
     Parameters:
       standardized (dict): Standardized data matrix.
     """
+    colors = {"Arithmancy": "blue", "Potions": "red",
+              "Care of Magical Creatures": "green"}
     for feature, data in standardized.items():
-        plt.hist(data, bins=30, alpha=0.5, label=feature)
+        if feature in colors:
+            plt.hist(data, bins=30, alpha=0.5, label=feature,
+                     color=colors[feature])
     plt.legend(loc='upper right')
     plt.xlabel("Standardized value")
     plt.ylabel("Frequency")
@@ -86,8 +90,8 @@ def main(ac: int, av: list):
         for feature in features:
             col = ftdt.filter_col(df[feature].tolist())
             standardized[feature] = standardize_array(col)
-        draw_merged_histogram(standardized)
         draw_unique_histogram(standardized)
+        draw_merged_histogram(standardized)
         plt.show()
     except Exception as e:
         print(f"Error: {e}")
