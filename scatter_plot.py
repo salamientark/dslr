@@ -73,7 +73,7 @@ def main(ac: int, av: list):
         if (ac != 2):
             raise Exception("Usage: describe.py <dataset_path>")
         df = pd.read_csv(av[1])  # Dataframe
-        features = ftdt.get_numerical_features(df)
+        features = ftdt.get_numerical_features(df, exclude=['Index'])
         matrix = {}
         for feature in features:
             col = df[feature].tolist()
