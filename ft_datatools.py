@@ -1,4 +1,5 @@
 import pandas as pd
+import ft_math as ftm
 
 
 def get_numerical_features(
@@ -122,3 +123,49 @@ def select_columns(df: pd.DataFrame, features: list) -> pd.DataFrame:
       pd.DataFrame: Dataframe with only the specified columns.
     """
     return df[features]
+
+
+def standardize_array(array,
+                      mean: float | None = None,
+                      std: float | None = None
+                      ) -> list:
+    """Standardize a list of numerical values.
+
+    Parameters:
+    array (list): List of numerical values.
+    mean (float | None): Mean of the list. If None, it will be computed.
+    std (float | None): Standard deviation of the list. If None, it will be
+        computed.
+
+    Returns:
+    list: Standardized list.
+    """
+    standardized = []
+    m = mean if mean is not None else ftm.ft_mean(array)
+    s = std if std is not None else ftm.ft_std(array)
+    for elem in array:
+        standardized.append((elem - m) / s if s != 0 else 0)
+    return standardized
+
+
+def standardize_df(df: pd.DataFrame, columns: list = []) -> pd.DataFrame:
+    """Standardize the specified columns of a dataframe.
+
+    Parameters:
+      df (pd.DataFrame): Dataframe.
+      columns (list) (optional): List of columns to standardize. If empty,
+                                 all numerical columns will be standardized.
+
+    Returns:
+      pd.DataFrame: Dataframe with standardized columns.
+    """
+    standardized_df = df.copy()
+    if not columns:
+        columns = get_numerical_features(standardized_df)
+    for col in columns:
+        col_data = filter_col(standardized_df[col].tolist())
+        mean = ftm.ft_mean(col_data)
+        std = ftm.ft_std(col_data)
+        standardized_df[col] = standardize_array(standardized_df[col].tolist(),
+                                                 mean, std)
+    return standardized_df
