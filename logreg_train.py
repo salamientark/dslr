@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import ft_datatools as ftdt
 import ft_math as ftm
+from tqdm import tqdm
 
 
 # MODEL LEARNING PARAM
@@ -9,7 +10,7 @@ TARGET = "Hogwarts House"  # Class column
 # Features to use for classification
 FEATURES = ["Astronomy", "Herbology", "Ancient Runes"]
 ALPHA = 0.1  # Learning rate
-ITERATION = 1
+ITERATION = 1000
 
 
 def gradient_descent(thetas: np.ndarray,
@@ -142,7 +143,7 @@ def main():
         thetas = init_thetas(classes, len(FEATURES) + 1)
         data = standardized_df.drop(columns=[TARGET])
         data.insert(0, 'x0', 1)  # Add x0 col filled with 1
-        for _ in range(ITERATION):
+        for _ in tqdm(range(ITERATION)):
             thetas = train(standardized_df[TARGET], data, classes, thetas)
         unstandardized = unstandardized_thetas(thetas, cleaned_df)
         print(unstandardized)
