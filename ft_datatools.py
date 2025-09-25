@@ -1,5 +1,43 @@
+import numpy as np
 import pandas as pd
 import ft_math as ftm
+
+
+def score_function(thetas: np.ndarray, features: np.ndarray) -> float:
+    """Calculate score function for one sample
+    thetas and features has to be the same size
+
+    Parameters:
+      thetas (np.ndarray): Thetas values
+      features (np.ndarray): Features values
+
+    Returns:
+      np.ndarray: Score value
+    """
+    tmp_theta = thetas
+    if thetas.shape != features.shape:
+        tmp_theta = thetas.reshape(-1, 1)
+    return np.dot(features, tmp_theta)
+
+
+def sigmoid(
+        thetas: np.ndarray,
+        features: np.ndarray,
+        value: float | None = None
+        ) -> float:
+    """Calculate sigmoid function for one sample
+
+    Parameters:
+      thetas (np.ndarray): Thetas values for score function
+      features (np.ndarray): Features values for score function
+      value (float | None): If value is given, calculate sigmoid for this
+                       value instead of score function
+
+    Returns:
+      np.ndarray: Sigmoid value
+    """
+    val = value if value is not None else score_function(thetas, features)
+    return 1 / (1 + np.exp(-val))
 
 
 def get_numerical_features(

@@ -12,43 +12,6 @@ ALPHA = 0.1  # Learning rate
 ITERATION = 1
 
 
-def score_function(thetas: np.ndarray, features: np.ndarray) -> float:
-    """Calculate score function for one sample
-    thetas and features has to be the same size
-
-    Parameters:
-      thetas (np.ndarray): Thetas values
-      features (np.ndarray): Features values
-
-    Returns:
-      np.ndarray: Score value
-    """
-    tmp_theta = thetas
-    if thetas.shape != features.shape:
-        tmp_theta = thetas.reshape(-1, 1)
-    return np.dot(features, tmp_theta)
-
-
-def sigmoid(
-        thetas: np.ndarray,
-        features: np.ndarray,
-        value: float | None = None
-        ) -> float:
-    """Calculate sigmoid function for one sample
-
-    Parameters:
-      thetas (np.ndarray): Thetas values for score function
-      features (np.ndarray): Features values for score function
-      value (float | None): If value is given, calculate sigmoid for this
-                       value instead of score function
-
-    Returns:
-      np.ndarray: Sigmoid value
-    """
-    val = value if value is not None else score_function(thetas, features)
-    return 1 / (1 + np.exp(-val))
-
-
 def gradient_descent(thetas: np.ndarray,
                      features: pd.DataFrame,
                      target: np.ndarray,
@@ -68,7 +31,7 @@ def gradient_descent(thetas: np.ndarray,
     new_thetas = thetas.copy()
     sums = np.zeros(thetas.shape)
     for i, row in features.iterrows():
-        prediction = sigmoid(thetas, row.values)
+        prediction = ftdt.sigmoid(thetas, row.values)
         error = prediction - target[i]
         for j in range(len(thetas)):
             sums[j] += error * row.values[j]
@@ -163,8 +126,7 @@ def save_thetas(thetas: dict) -> None:
     thetas (dict): Thetas to save
     """
     with open("thetas.csv", "w") as f:
-        f.write("Class," + ",".join([f"theta_{i}" for i in range(
-            len(next(iter(thetas.values()))))]) + "\n")
+        f.write("Class,Bias," + ",".join(FEATURES) + "\n")
         for cls, theta in thetas.items():
             f.write(cls + "," + ",".join([str(t) for t in theta]) + "\n")
 
