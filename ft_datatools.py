@@ -309,9 +309,9 @@ def batch_gradient_descent(thetas: np.ndarray,
                            features: pd.DataFrame,
                            target: np.ndarray,
                            alpha: float,
-                           hypothesis=None
+                           hypothesis=score_function
                            ) -> np.ndarray:
-    """Calculate new thetas values using gradient descent
+    """Calculate new thetas values using batch gradient descent
 
     Parameters:
       thetas (np.ndarray): Current thetas values
@@ -326,13 +326,50 @@ def batch_gradient_descent(thetas: np.ndarray,
     """
     new_thetas = thetas.copy()
     sums = np.zeros(thetas.shape)
-    f = score_function if hypothesis is None else hypothesis
     for i, row in features.iterrows():
-        prediction = f(thetas, row.values)
+        prediction = hypothesis(thetas, row.values)
         error = prediction - target[i]
         for j in range(len(thetas)):
             sums[j] += error * row.values[j]
     for j in range(len(thetas)):
         sums[j] /= len(features)
         new_thetas[j] -= alpha * sums[j]
+    return new_thetas
+
+
+def stochastic_gradient_descent(thetas: np.ndarray,
+                                features: pd.DataFrame,
+                                target: np.ndarray,
+                                alpha: float,
+                                hypothesis=score_function
+                                ) -> np.ndarray:
+    """Calculate new thetas values using stochastic gradient descent
+
+    Parameters:
+      thetas (np.ndarray): Current thetas values
+      features (pd.DataFrame): Features values
+      target (np.ndarray): Target values (0 or 1)
+      alpha (float): Learning rate
+      hypothesis (function) (optionnal): Hypothesis function to use if not
+                                         provided score_function will be used
+
+    Returns:
+      array: New theta value
+    """
+
+    # Shuffle dataset
+    merged_df = features.copy()
+    merged_df['target'] = target
+    shuffled_df = merged_df.sample(frac=1).reset_index(drop=True)
+    target = shuffled_df['target'].to_numpy()
+    data = shuffled_df.drop(columns=['target'])
+    new_thetas, tmp_theta = thetas.copy(), {}
+    derivative = np.zeros(thetas.shape)
+    for i, row in data.iterrows():
+        tmp_theta = new_thetas.copy()
+        prediction = hypothesis(tmp_theta, row.values)
+        error = prediction - target[i]
+        for j in range(len(tmp_theta)):
+            derivative[j] = error * row.values[j]
+            new_thetas[j] -= alpha * derivative[j]
     return new_thetas

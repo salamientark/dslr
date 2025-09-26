@@ -15,7 +15,10 @@ def train(
         target_col: pd.Series,
         data: pd.DataFrame,
         classes: list,
-        thetas: dict
+        thetas: dict,
+        alpha: float = 0.1,
+        algo=ftdt.batch_gradient_descent,
+        hypothesis=ftdt.score_function
         ) -> dict:
     """Train model and update thetas values
 
@@ -24,6 +27,11 @@ def train(
     data (pd.DataFrame): Features data
     classes (list): List of class names
     thetas (dict): Thetas values for each class
+    alpha (float, optional): Learning rate. Defaults to 0.1.
+    algo (function, optional): Algorithm to use for training. Defaults to
+                               None, which uses batch_gradient_descent.
+    hypothesis (function, optional): Hypothesis function to use. Defaults to
+                                     None, which uses score_function.
 
     Returns:
     dict: Updated thetas values
@@ -32,8 +40,8 @@ def train(
     new_thetas = thetas.copy()
     for elem in classes:
         true_result = ftdt.convert_classes_to_nbr(elem, target_col)
-        new_thetas[elem] = ftdt.batch_gradient_descent(
-                thetas[elem], data, true_result, ALPHA)
+        new_thetas[elem] = algo(thetas[elem], data, true_result, alpha,
+                                hypothesis)
     return new_thetas
 
 
@@ -50,7 +58,9 @@ def main():
         data.insert(0, 'x0', 1)  # Add x0 col filled with 1
         print("Training model...")
         for _ in tqdm(range(ITERATION)):
-            thetas = train(standardized_df[TARGET], data, classes, thetas)
+            thetas = train(standardized_df[TARGET], data, classes, thetas,
+                           algo=ftdt.batch_gradient_descent,
+                           hypothesis=ftdt.sigmoid)
         unstandardized = ftdt.unstandardized_thetas(thetas, cleaned_df,
                                                     FEATURES)
         ftdt.save_thetas(unstandardized, FEATURES)
