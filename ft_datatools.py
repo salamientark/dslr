@@ -212,7 +212,7 @@ def standardize_df(df: pd.DataFrame, columns: list = []) -> pd.DataFrame:
 def replace_nan(
         df: pd.DataFrame,
         columns: list = [],
-        func = None
+        func=None
         ) -> pd.DataFrame:
     """Replace NaN values in a dataframe with the mean of the column
 
