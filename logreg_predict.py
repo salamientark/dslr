@@ -57,9 +57,11 @@ def main(ac: int, av: list):
         features = weights.drop(columns=['Class', 'Bias']).columns.tolist()
         data = replace_nan(df[features])
         # for i, row in data.iterrows():
-        for i, row in tqdm(data.iterrows(), total=len(data)):
-            predicted_class = predict(weights, row.tolist())
-            print(f"{i:03d}: {predicted_class}")
+        with open('houses.txt', 'w') as f:
+            f.write("Index,Hogwarts House\n")
+            for i, row in tqdm(data.iterrows(), total=len(data)):
+                predicted_class = predict(weights, row.tolist())
+                f.write(f"{i},{predicted_class}\n")
     except Exception as e:
         print(f"Error: {e}")
 
