@@ -31,14 +31,14 @@ def main(ac: int, av: list):
         if ac != 3:
             raise Exception("Usage: python logreg_predict.py dataset_test.csv"
                             " <weights.csv>")
-        if av[1] != "dataset_test.csv":
-            raise Exception("dataset_test.csv file name is required as"
-                            " the first argument.")
+        # if av[1] != "dataset_test.csv":
+        #     raise Exception("dataset_test.csv file name is required as"
+        #                     " the first argument.")
         df = pd.read_csv(av[1])
         weights = pd.read_csv(av[2])
         features = weights.drop(columns=['Class', 'Bias']).columns.tolist()
         data = ftdt.replace_nan(df[features])
-        with open('houses.txt', 'w') as f:
+        with open('houses.csv', 'w') as f:
             f.write("Index,Hogwarts House\n")
             for i, row in tqdm(data.iterrows(), total=len(data)):
                 predicted_class = predict(weights, row.tolist())
