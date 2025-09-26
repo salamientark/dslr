@@ -1,26 +1,8 @@
 import sys
 import pandas as pd
 import numpy as np
-import ft_math as ftm
 import ft_datatools as ftdt
 from tqdm import tqdm
-
-
-def replace_nan(
-        df: pd.DataFrame,
-        ) -> pd.DataFrame:
-    """Replace NaN values in a dataframe with the mean of the column
-
-    Parameters:
-      df (pd.DataFrame): Dataframe to process
-
-    Returns:
-      pd.DataFrame: Dataframe with NaN values replaced
-    """
-    for column in df.columns:
-        mean = ftm.ft_mean(df[column].to_list())
-        column = df[column].fillna(mean)
-    return df
 
 
 def predict(weights_df: pd.DataFrame, row: list) -> str:
@@ -55,8 +37,7 @@ def main(ac: int, av: list):
         df = pd.read_csv(av[1])
         weights = pd.read_csv(av[2])
         features = weights.drop(columns=['Class', 'Bias']).columns.tolist()
-        data = replace_nan(df[features])
-        # for i, row in data.iterrows():
+        data = ftdt.replace_nan(df[features])
         with open('houses.txt', 'w') as f:
             f.write("Index,Hogwarts House\n")
             for i, row in tqdm(data.iterrows(), total=len(data)):

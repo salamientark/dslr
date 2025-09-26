@@ -3,6 +3,23 @@ import pandas as pd
 import ft_math as ftm
 
 
+def replace_nan(
+        df: pd.DataFrame,
+        ) -> pd.DataFrame:
+    """Replace NaN values in a dataframe with the mean of the column
+
+    Parameters:
+      df (pd.DataFrame): Dataframe to process
+
+    Returns:
+      pd.DataFrame: Dataframe with NaN values replaced
+    """
+    for column in df.columns:
+        mean = ftm.ft_mean(df[column].to_list())
+        column = df[column].fillna(mean)
+    return df
+
+
 def score_function(thetas: np.ndarray, features: np.ndarray) -> float:
     """Calculate score function for one sample
     thetas and features has to be the same size
