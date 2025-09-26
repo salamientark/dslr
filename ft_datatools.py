@@ -233,3 +233,73 @@ def replace_nan(
         val = f(tmp_col)
         new_df[column] = new_df[column].fillna(val)
     return new_df
+
+
+def init_thetas(classes: list, feature_nbr: int) -> dict:
+    """Initialize thetas dictionary with zeros
+
+    Parameters:
+    classes (list): List of class names
+    feature_nbr (int): Number of features
+    """
+    thetas = {}
+    for elem in classes:
+        thetas[elem] = np.zeros(feature_nbr)
+    return thetas
+
+
+def unstandardized_thetas(
+        thetas: dict,
+        df: pd.DataFrame,
+        features: list
+        ) -> dict:
+    """Convert standardized thetas to unstandardized thetas
+
+    Parameters:
+      thetas (dict): Standardized thetas
+      df (pd.DataFrame): Dataframe with original data
+      features (list): List of features names
+
+    Returns:
+      dict: Unstandardized thetas
+    """
+    means = {}
+    std = {}
+    for feature in features:
+        means[feature] = ftm.ft_mean(df[feature].to_list())
+        std[feature] = ftm.ft_std(df[feature].to_list())
+    unstandardized = {}
+    for cls, theta in thetas.items():
+        unstandardized[cls] = theta.copy()
+        for i in range(1, len(theta)):
+            unstandardized[cls][i] = theta[i] / std[features[i - 1]]
+            unstandardized[cls][0] -= (
+                theta[i] * means[features[i - 1]]) / std[features[i - 1]]
+    return unstandardized
+
+
+def save_thetas(thetas: dict, features: list) -> None:
+    """Save thetas to a file
+
+    Parameters:
+      thetas (dict): Thetas to save
+      features (list): List of features names
+    """
+    with open("thetas.csv", "w") as f:
+        f.write("Class,Bias," + ",".join(features) + "\n")
+        for cls, theta in thetas.items():
+            f.write(cls + "," + ",".join([str(t) for t in theta]) + "\n")
+
+
+def convert_classes_to_nbr(class_name: str, data: pd.Series) -> pd.Series:
+    """Convert class names to numerical values
+
+    Parameters:
+    class_name (str): Class name
+    data (pd.Series): Series with class names
+
+    Returns:
+    pd.Series: Series with numerical values
+    """
+    converted_col = (data == class_name).astype(int)
+    return converted_col.astype(int)
