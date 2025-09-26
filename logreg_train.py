@@ -18,7 +18,8 @@ def train(
         thetas: dict,
         alpha: float = 0.1,
         algo=ftdt.batch_gradient_descent,
-        hypothesis=ftdt.score_function
+        hypothesis=ftdt.score_function,
+        batch_size: int = 32
         ) -> dict:
     """Train model and update thetas values
 
@@ -32,6 +33,7 @@ def train(
                                None, which uses batch_gradient_descent.
     hypothesis (function, optional): Hypothesis function to use. Defaults to
                                      None, which uses score_function.
+    batch_size (int, optional): Size of the batch for mini-batch gradient
 
     Returns:
     dict: Updated thetas values
@@ -40,8 +42,13 @@ def train(
     new_thetas = thetas.copy()
     for elem in classes:
         true_result = ftdt.convert_classes_to_nbr(elem, target_col)
-        new_thetas[elem] = algo(thetas[elem], data, true_result, alpha,
-                                hypothesis)
+        if algo == ftdt.mini_batch_gradient_descent:
+            new_thetas[elem] = algo(thetas[elem], data, true_result, alpha,
+                                    hypothesis=hypothesis,
+                                    batch_size=batch_size)
+        else:
+            new_thetas[elem] = algo(thetas[elem], data, true_result, alpha,
+                                    hypothesis)
     return new_thetas
 
 
@@ -58,9 +65,12 @@ def main():
         data.insert(0, 'x0', 1)  # Add x0 col filled with 1
         print("Training model...")
         for _ in tqdm(range(ITERATION)):
+            # thetas = train(standardized_df[TARGET], data, classes, thetas,
+            #                algo=ftdt.batch_gradient_descent,
+            #                hypothesis=ftdt.sigmoid)
             thetas = train(standardized_df[TARGET], data, classes, thetas,
-                           algo=ftdt.batch_gradient_descent,
-                           hypothesis=ftdt.sigmoid)
+                           algo=ftdt.mini_batch_gradient_descent,
+                           hypothesis=ftdt.sigmoid, batch_size=32)
         unstandardized = ftdt.unstandardized_thetas(thetas, cleaned_df,
                                                     FEATURES)
         ftdt.save_thetas(unstandardized, FEATURES)

@@ -373,3 +373,48 @@ def stochastic_gradient_descent(thetas: np.ndarray,
             derivative[j] = error * row.values[j]
             new_thetas[j] -= alpha * derivative[j]
     return new_thetas
+
+
+def mini_batch_gradient_descent(thetas: np.ndarray,
+                                features: pd.DataFrame,
+                                target: np.ndarray,
+                                alpha: float,
+                                batch_size: int = 32,
+                                hypothesis=score_function
+                                ) -> np.ndarray:
+    """Calculate new thetas values using mini batch gradient descent
+
+    Parameters:
+      thetas (np.ndarray): Current thetas values
+      features (pd.DataFrame): Features values
+      target (np.ndarray): Target values (0 or 1)
+      alpha (float): Learning rate
+      batch_size (int): Size of the mini batch
+      hypothesis (function) (optionnal): Hypothesis function to use if not
+                                         provided score_function will be used
+
+    Returns:
+      array: New theta value
+    """
+    # Shuffle dataset
+    merged_df = features.copy()
+    merged_df['target'] = target
+    shuffled_df = merged_df.sample(frac=1).reset_index(drop=True)
+    target = shuffled_df['target'].to_numpy()
+    data = shuffled_df.drop(columns=['target'])
+    new_thetas, tmp_theta = thetas.copy(), {}
+    for i in range(len(data)):
+        sums = np.zeros(thetas.shape)
+        tmp_theta = new_thetas.copy()
+        limit = int(ftm.ft_min([batch_size, len(data) - i]))
+        for _ in range(limit):
+            row = data.iloc[i]
+            prediction = hypothesis(tmp_theta, row)
+            error = prediction - target[i]
+            for j in range(len(thetas)):
+                sums[j] += error * row.values[j]
+            i += 1
+        for j in range(len(tmp_theta)):
+            sums[j] /= limit
+            new_thetas[j] -= alpha * sums[j]
+    return new_thetas
