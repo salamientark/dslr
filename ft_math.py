@@ -171,6 +171,7 @@ def ft_q3(array, count: int | None = None) -> int | float:
     sorted_array = sorted(array)
     return sorted_array[(c // 4) * 3]
 
+
 def ft_skew(
         array,
         count: int | None = None,

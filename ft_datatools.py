@@ -303,3 +303,36 @@ def convert_classes_to_nbr(class_name: str, data: pd.Series) -> pd.Series:
     """
     converted_col = (data == class_name).astype(int)
     return converted_col.astype(int)
+
+
+def batch_gradient_descent(thetas: np.ndarray,
+                           features: pd.DataFrame,
+                           target: np.ndarray,
+                           alpha: float,
+                           hypothesis=None
+                           ) -> np.ndarray:
+    """Calculate new thetas values using gradient descent
+
+    Parameters:
+      thetas (np.ndarray): Current thetas values
+      features (pd.DataFrame): Features values
+      target (np.ndarray): Target values (0 or 1)
+      alpha (float): Learning rate
+      hypothesis (function) (optionnal): Hypothesis function to use if not
+                                         provided score_function will be used
+
+    Returns:
+      float: New theta value
+    """
+    new_thetas = thetas.copy()
+    sums = np.zeros(thetas.shape)
+    f = score_function if hypothesis is None else hypothesis
+    for i, row in features.iterrows():
+        prediction = f(thetas, row.values)
+        error = prediction - target[i]
+        for j in range(len(thetas)):
+            sums[j] += error * row.values[j]
+    for j in range(len(thetas)):
+        sums[j] /= len(features)
+        new_thetas[j] -= alpha * sums[j]
+    return new_thetas
