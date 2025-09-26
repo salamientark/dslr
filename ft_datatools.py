@@ -212,20 +212,24 @@ def standardize_df(df: pd.DataFrame, columns: list = []) -> pd.DataFrame:
 def replace_nan(
         df: pd.DataFrame,
         columns: list = [],
+        func = None
         ) -> pd.DataFrame:
     """Replace NaN values in a dataframe with the mean of the column
 
     Parameters:
       df (pd.DataFrame): Dataframe to process
       columns (list) (optionnal): List of columns to use of specified
+    func (function) (optionnal): Function to use to compute the
+            missing values. If None is provided the mean will be used.
 
     Returns:
       pd.DataFrame: Dataframe with NaN values replaced
     """
     new_df = df.copy()
+    f = func if func is not None else ftm.ft_mean
     cols = columns if columns != [] else new_df.columns
     for column in cols:
         tmp_col = filter_col(new_df[column].tolist())
-        mean = ftm.ft_mean(tmp_col)
-        new_df[column] = new_df[column].fillna(mean)
+        val = f(tmp_col)
+        new_df[column] = new_df[column].fillna(val)
     return new_df
