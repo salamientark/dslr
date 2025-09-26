@@ -69,6 +69,7 @@ def ft_variance(
 
 def ft_std(
         array,
+        mean: float | None = None,
         var: float | None = None,
         count: int | None = None
         ) -> float:
@@ -76,6 +77,8 @@ def ft_std(
 
     Parameters:
       array (list): List of numbers.
+      mean (float) (optional): Mean of the list of numbers. If None, it
+                               will be computed.
       var (float) (optional): Variance of the list of numbers. If None,
                               it will be computed.
       count (int) (optionnal): Number of elements in the list. If None, it
@@ -167,3 +170,64 @@ def ft_q3(array, count: int | None = None) -> int | float:
         c = len(array)
     sorted_array = sorted(array)
     return sorted_array[(c // 4) * 3]
+
+def ft_skew(
+        array,
+        count: int | None = None,
+        mean: float | None = None,
+        std: float | None = None
+        ) -> float:
+    """Compute the skewness of a list of numbers.
+    Measures the asymmetry of the probability distribution.
+
+    Parameters:
+      array (list): List of numbers.
+      count (int) (optional): Number of elements in the list. If None, it
+                              will be computed.
+      mean (float) (optional): Mean of the list of numbers. If None, it will
+                               be computed.
+      std (float) (optional): Standard deviation of the list of numbers. If
+                              None, it will be computed.
+
+    Returns:
+      float: Skewness of the list of numbers.
+    """
+    c = count if count is not None else len(array)
+    m = mean if mean is not None else ft_mean(array, count=c)
+    st = std if std is not None else ft_std(array, mean=m, count=c)
+    u = 0
+    for i in range(c):
+        u += (array[i] - m) ** 3
+    u /= c
+    return u / (st ** 3) if st != 0 else 0
+
+
+def ft_kurtosis(
+        array,
+        count: int | None = None,
+        mean: float | None = None,
+        std: float | None = None
+        ) -> float:
+    """Compute the kurtosis of a list of numbers.
+    Measures the flatness of the probability distribution.
+
+    Parameters:
+      array (list): List of numbers.
+      count (int) (optional): Number of elements in the list. If None, it
+                              will be computed.
+      mean (float) (optional): Mean of the list of numbers. If None, it will
+                               be computed.
+      std (float) (optional): Standard deviation of the list of numbers. If
+                              None, it will be computed.
+
+    Returns:
+      float: Kurosis of the list of numbers.
+    """
+    c = count if count is not None else len(array)
+    m = mean if mean is not None else ft_mean(array, count=c)
+    st = std if std is not None else ft_std(array, mean=m, count=c)
+    u = 0
+    for i in range(c):
+        u += (array[i] - m) ** 4
+    u /= c
+    return u / (st ** 4) - 3 if st != 0 else 0

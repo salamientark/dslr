@@ -13,7 +13,10 @@ def print_result(
         q1s: list,
         q2s: list,
         q3s: list,
-        maxs: list
+        maxs: list,
+        variances: list,
+        skewness: list,
+        kurtosis: list
         ):
     """Print the result of the description.
 
@@ -27,6 +30,9 @@ def print_result(
       q2s (list): List of medians.
       q3s (list): List of third quartiles.
       maxs (list): List of maximums.
+      variances (list): List of variances.
+      skewness (list): List of skewnesses.
+      kurtosis (list): List of kurtoses.
     """
     i = 0
     step = 4
@@ -85,6 +91,24 @@ def print_result(
             print(f"{maxs[j]:>20.6f}", end="")
             j += 1
         print()
+        j = i
+        print(f"{'Variance':<12}", end="")
+        while j < step and j < len(features):
+            print(f"{variances[j]:>20.6f}", end="")
+            j += 1
+        print()
+        j = i
+        print(f"{'Skewness':<12}", end="")
+        while j < step and j < len(features):
+            print(f"{skewness[j]:>20.6f}", end="")
+            j += 1
+        print()
+        j = i
+        print(f"{'Kurtosis':<12}", end="")
+        while j < step and j < len(features):
+            print(f"{kurtosis[j]:>20.6f}", end="")
+            j += 1
+        print()
         print()
         i += 4
         step += 4
@@ -105,6 +129,7 @@ def main(ac: int, av: list):
         features = ftdt.get_numerical_features(df)
         counts, means, stds, mins, q1s, q2s = [], [], [], [], [], []
         q3s, maxs = [], []
+        skewness, kurtosis, variance = [], [], []
         for feature in features:
             col = ftdt.filter_col(df[feature].tolist())
             size = len(col)
@@ -116,7 +141,13 @@ def main(ac: int, av: list):
             q2s.append(ftm.ft_q2(col, count=size))
             q3s.append(ftm.ft_q3(col, count=size))
             maxs.append(ftm.ft_max(col))
-        print_result(features, counts, means, stds, mins, q1s, q2s, q3s, maxs)
+            variance.append(ftm.ft_variance(col, mean=means[-1], count=size))
+            skewness.append(ftm.ft_skew(
+                col, mean=means[-1], std=stds[-1], count=size))
+            kurtosis.append(ftm.ft_kurtosis(
+                col, mean=means[-1], std=stds[-1], count=size))
+        print_result(features, counts, means, stds, mins, q1s, q2s, q3s, maxs,
+                     variance, skewness, kurtosis)
     except Exception as e:
         print(f"Error: {e}")
 
