@@ -28,3 +28,6 @@ A data science project focused on building a multi-class classifier using logist
 - Astronomy, Herbology, Ancient Runes, Flying  
   Accuracy: 98.19%
 
+
+### Way for improvment
+Change row by row calculation by matrix calculation
