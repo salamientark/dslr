@@ -10,7 +10,7 @@ TARGET = "Hogwarts House"  # Class column
 # Features to use for classification
 FEATURES = ["Astronomy", "Herbology", "Ancient Runes"]
 ALPHA = 0.1  # Learning rate
-ITERATION = 1000
+ITERATION = 100
 
 
 def gradient_descent(thetas: np.ndarray,
@@ -137,16 +137,16 @@ def main():
     try:
         df = pd.read_csv("dataset_train.csv")  # Load data
         filtered_df = df[FEATURES + [TARGET]]
-        cleaned_df = ftdt.remove_missing(filtered_df)
+        cleaned_df = ftdt.replace_nan(filtered_df, columns=FEATURES)
         standardized_df = ftdt.standardize_df(cleaned_df, FEATURES)
         classes = ftdt.get_class_list(standardized_df, TARGET)
         thetas = init_thetas(classes, len(FEATURES) + 1)
         data = standardized_df.drop(columns=[TARGET])
         data.insert(0, 'x0', 1)  # Add x0 col filled with 1
+        print("Training model...")
         for _ in tqdm(range(ITERATION)):
             thetas = train(standardized_df[TARGET], data, classes, thetas)
         unstandardized = unstandardized_thetas(thetas, cleaned_df)
-        print(unstandardized)
         save_thetas(unstandardized)
     except Exception as e:
         print(f"Error: {e}")

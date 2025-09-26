@@ -3,23 +3,6 @@ import pandas as pd
 import ft_math as ftm
 
 
-def replace_nan(
-        df: pd.DataFrame,
-        ) -> pd.DataFrame:
-    """Replace NaN values in a dataframe with the mean of the column
-
-    Parameters:
-      df (pd.DataFrame): Dataframe to process
-
-    Returns:
-      pd.DataFrame: Dataframe with NaN values replaced
-    """
-    for column in df.columns:
-        mean = ftm.ft_mean(df[column].to_list())
-        column = df[column].fillna(mean)
-    return df
-
-
 def score_function(thetas: np.ndarray, features: np.ndarray) -> float:
     """Calculate score function for one sample
     thetas and features has to be the same size
@@ -224,3 +207,25 @@ def standardize_df(df: pd.DataFrame, columns: list = []) -> pd.DataFrame:
         standardized_df[col] = standardize_array(standardized_df[col].tolist(),
                                                  mean, std)
     return standardized_df
+
+
+def replace_nan(
+        df: pd.DataFrame,
+        columns: list = [],
+        ) -> pd.DataFrame:
+    """Replace NaN values in a dataframe with the mean of the column
+
+    Parameters:
+      df (pd.DataFrame): Dataframe to process
+      columns (list) (optionnal): List of columns to use of specified
+
+    Returns:
+      pd.DataFrame: Dataframe with NaN values replaced
+    """
+    new_df = df.copy()
+    cols = columns if columns != [] else new_df.columns
+    for column in cols:
+        tmp_col = filter_col(new_df[column].tolist())
+        mean = ftm.ft_mean(tmp_col)
+        new_df[column] = new_df[column].fillna(mean)
+    return new_df
