@@ -22,12 +22,12 @@ def predict(weights_df: pd.DataFrame, row: list) -> str:
     """
     prediction = None
     result = {}
-    for i, cls in weights_df.iterrows():
+    for _, cls in weights_df.iterrows():
         result[cls['Class']] = ftdt.sigmoid(
                 cls.drop(['Class']), np.array([1] + row))
         if prediction is None or result[cls['Class']] > result[prediction]:
             prediction = cls['Class']
-    return prediction
+    return str(prediction)
 
 
 def main(ac: int, av: list):
@@ -36,9 +36,6 @@ def main(ac: int, av: list):
         if ac != 3:
             raise Exception("Usage: python logreg_predict.py dataset_test.csv"
                             " <weights.csv>")
-        # if av[1] != "dataset_test.csv":
-        #     raise Exception("dataset_test.csv file name is required as"
-        #                     " the first argument.")
         df = pd.read_csv(av[1])
         weights = pd.read_csv(av[2])
         features = weights.drop(columns=['Class', 'Bias']).columns.tolist()
