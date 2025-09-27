@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -16,13 +17,13 @@ def ft_isnbr(elem) -> bool:
 
 
 def ft_mean(
-        array,
+        array: np.ndarray,
         count: int | None = None
         ) -> float:
     """Compute the mean of a list of numbers.
 
     Parameters:
-      array (list): List of numbers.
+      array (np.ndarray): List of numbers.
       count (int) (optional): Number of elements in the list. If None, it
                               will be computed.
 

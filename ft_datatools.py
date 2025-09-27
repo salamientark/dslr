@@ -90,24 +90,17 @@ def get_class_list(df: pd.DataFrame, col: str) -> list:
         raise Exception(f"Column '{col}' not found in the dataframe.") from e
 
 
-def filter_col(col: list) -> list:
+def filter_col(col: np.ndarray) -> np.ndarray:
     """Filter a column to keep only numerical values.
 
     Parameters:
-      col (list): Column to filter.
+      col (np.ndarray): Column to filter.
 
     Returns:
-      list: Filtered column.
+      np.ndarray: Filtered column.
     """
-    i = 0
-    lim = len(col)
-    while i < lim:
-        if col[i] is None or pd.isna(col[i]):
-            del col[i]
-            lim -= 1
-            continue
-        i += 1
-    return col
+    col = np.array(col)
+    return col[~pd.isna(col)]
 
 
 def remove_missing(df: pd.DataFrame, exclude: list[str] = []) -> pd.DataFrame:
@@ -121,10 +114,8 @@ def remove_missing(df: pd.DataFrame, exclude: list[str] = []) -> pd.DataFrame:
       pd.DataFrame: Dataframe without missing values.
     """
     cleaned_df = df.copy()
-    for i, row in cleaned_df.iterrows():
-        filtered_row = row.drop(exclude)
-        if filtered_row.isnull().any():
-            cleaned_df = cleaned_df.drop(i)
+    subset = [col for col in cleaned_df.columns if col not in exclude]
+    cleaned_df = cleaned_df.dropna(subset=subset, inplace=True)
     return cleaned_df
 
 
@@ -140,13 +131,10 @@ def classify(df: pd.DataFrame, target_col: str, features: list
     Returns:
       dict[pd.DataFrame]: Dictionary of dataframes classified by class.
     """
-    target = get_class_list(df, target_col)
-    res = {key: [] for key in target}
-    for i, row in df.iterrows():
-        numeric_row = row.drop(target_col)
-        res[row[target_col]].append(numeric_row)
-    for key in res:
-        res[key] = pd.DataFrame(res[key], columns=features)
+    res = {}
+    grouped = df.groupby(target_col)
+    for key, group in grouped:
+        res[key] = group[features].copy()
     return res
 
 
@@ -163,20 +151,20 @@ def select_columns(df: pd.DataFrame, features: list) -> pd.DataFrame:
     return df[features]
 
 
-def standardize_array(array,
+def standardize_array(array: np.ndarray,
                       mean: float | None = None,
                       std: float | None = None
                       ) -> np.ndarray:
     """Standardize a list of numerical values.
 
     Parameters:
-    array (list): List of numerical values.
+    array (np.ndarray): List of numerical values.
     mean (float | None): Mean of the list. If None, it will be computed.
     std (float | None): Standard deviation of the list. If None, it will be
         computed.
 
     Returns:
-    list: Standardized list.
+    np.ndarray: Standardized list.
     """
     m = mean if mean is not None else ftm.ft_mean(array)
     s = std if std is not None else ftm.ft_std(array)
@@ -203,8 +191,10 @@ def standardize_df(df: pd.DataFrame, columns: list = []) -> pd.DataFrame:
         col_data = filter_col(standardized_df[col].tolist())
         mean = ftm.ft_mean(col_data)
         std = ftm.ft_std(col_data)
-        standardized_df[col] = standardize_array(standardized_df[col].tolist(),
-                                                 mean, std)
+        if std == 0:
+            standardized_df[col] = 0
+        else:
+            standardized_df[col] = standardize_array(standardized_df[col])
     return standardized_df
 
 
@@ -262,18 +252,21 @@ def unstandardized_thetas(
     Returns:
       dict: Unstandardized thetas
     """
-    means = {}
-    std = {}
-    for feature in features:
-        means[feature] = ftm.ft_mean(df[feature].to_list())
-        std[feature] = ftm.ft_std(df[feature].to_list())
-    unstandardized = {}
-    for cls, theta in thetas.items():
-        unstandardized[cls] = theta.copy()
-        for i in range(1, len(theta)):
-            unstandardized[cls][i] = theta[i] / std[features[i - 1]]
-            unstandardized[cls][0] -= (
-                theta[i] * means[features[i - 1]]) / std[features[i - 1]]
+    means = {feature: ftm.ft_mean(df[feature]) for feature in features}
+    std = {feature: ftm.ft_std(df[feature], mean=means[feature])
+           for feature in features}
+    unstandardized = {
+        cls: [
+            theta[0] - sum(
+                (theta[i] * means[features[i - 1]]) / std[features[i - 1]]
+                for i in range(1, len(theta))
+            )
+        ] + [
+            theta[i] / std[features[i - 1]]
+            for i in range(1, len(theta))
+        ]
+        for cls, theta in thetas.items()
+    }
     return unstandardized
 
 

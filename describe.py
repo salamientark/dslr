@@ -131,7 +131,8 @@ def main(ac: int, av: list):
         q3s, maxs = [], []
         skewness, kurtosis, variance = [], [], []
         for feature in features:
-            col = ftdt.filter_col(df[feature].tolist())
+            col = ftdt.filter_col(df[feature])
+            print(col, ":type:", type(col))
             size = len(col)
             counts.append(size)
             means.append(ftm.ft_mean(col, count=size))

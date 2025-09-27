@@ -65,12 +65,12 @@ def main():
         data.insert(0, 'x0', 1)  # Add x0 col filled with 1
         print("Training model...")
         for _ in tqdm(range(ITERATION)):
-            # thetas = train(standardized_df[TARGET], data, classes, thetas,
-            #                algo=ftdt.batch_gradient_descent,
-            #                hypothesis=ftdt.sigmoid)
             thetas = train(standardized_df[TARGET], data, classes, thetas,
-                           algo=ftdt.mini_batch_gradient_descent,
-                           hypothesis=ftdt.sigmoid, batch_size=32)
+                           algo=ftdt.batch_gradient_descent,
+                           hypothesis=ftdt.sigmoid)
+            # thetas = train(standardized_df[TARGET], data, classes, thetas,
+            #                algo=ftdt.mini_batch_gradient_descent,
+            #                hypothesis=ftdt.sigmoid, batch_size=32)
         unstandardized = ftdt.unstandardized_thetas(thetas, cleaned_df,
                                                     FEATURES)
         ftdt.save_thetas(unstandardized, FEATURES)
