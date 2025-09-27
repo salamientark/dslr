@@ -5,6 +5,11 @@ import ft_datatools as ftdt
 from tqdm import tqdm
 
 
+# COLORS
+RED = '\033[91m'
+RESET = '\033[0m'
+
+
 def predict(weights_df: pd.DataFrame, row: list) -> str:
     """Predict the class of a given row using the weights
 
@@ -44,7 +49,7 @@ def main(ac: int, av: list):
                 predicted_class = predict(weights, row.tolist())
                 f.write(f"{i},{predicted_class}\n")
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"{RED}Error{RESET}: {e}")
 
 
 if __name__ == '__main__':

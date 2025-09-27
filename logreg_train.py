@@ -1,7 +1,12 @@
+import sys
 import pandas as pd
 import ft_datatools as ftdt
 from tqdm import tqdm
 
+
+# COLORS
+RED = '\033[91m'
+RESET = '\033[0m'
 
 # MODEL LEARNING PARAM
 TARGET = "Hogwarts House"  # Class column
@@ -52,34 +57,44 @@ def train(
     return new_thetas
 
 
-def main():
-    """Train model and save the thetas in a file."""
+def main(ac: int, av: list):
+    """Train model and save the thetas in a file.
+
+    Parameters:
+      ac (int): Number of command line arguments.
+      av (list): List of command line arguments.
+    """
     try:
-        df = pd.read_csv("dataset_train.csv")  # Load data
+        if ac != 2:
+            raise Exception("Usage: python logreg_train.py <dataset_train.csv>")
+        df = pd.read_csv(av[1])  # Load data
         filtered_df = df[FEATURES + [TARGET]]
         cleaned_df = ftdt.replace_nan(filtered_df, columns=FEATURES)
         standardized_df = ftdt.standardize_df(cleaned_df, FEATURES)
         classes = ftdt.get_class_list(standardized_df, TARGET)
+        if classes == []:
+            raise Exception("No class found in the target column."
+                            " Please check the dataset.")
         thetas = ftdt.init_thetas(classes, len(FEATURES) + 1)
         data = standardized_df.drop(columns=[TARGET])
         data.insert(0, 'x0', 1)  # Add x0 col filled with 1
         print("Training model...")
         for _ in tqdm(range(ITERATION)):
-            # thetas = train(standardized_df[TARGET], data, classes, thetas,
-            #                algo=ftdt.batch_gradient_descent,
-            #                hypothesis=ftdt.sigmoid)
+            thetas = train(standardized_df[TARGET], data, classes, thetas,
+                           algo=ftdt.batch_gradient_descent,
+                           hypothesis=ftdt.sigmoid)
             # thetas = train(standardized_df[TARGET], data, classes, thetas,
             #                algo=ftdt.stochastic_gradient_descent,
             #                hypothesis=ftdt.sigmoid)
-            thetas = train(standardized_df[TARGET], data, classes, thetas,
-                           algo=ftdt.mini_batch_gradient_descent,
-                           hypothesis=ftdt.sigmoid, batch_size=32)
+            # thetas = train(standardized_df[TARGET], data, classes, thetas,
+            #                algo=ftdt.mini_batch_gradient_descent,
+            #                hypothesis=ftdt.sigmoid, batch_size=32)
         unstandardized = ftdt.unstandardized_thetas(thetas, cleaned_df,
                                                     FEATURES)
         ftdt.save_thetas(unstandardized, FEATURES)
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"{RED}Error{RESET}: {e}")
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    main(len(sys.argv), sys.argv)
