@@ -189,7 +189,6 @@ def standardize_df(df: pd.DataFrame, columns: list = []) -> pd.DataFrame:
         columns = get_numerical_features(standardized_df)
     for col in columns:
         col_data = filter_col(standardized_df[col].tolist())
-        mean = ftm.ft_mean(col_data)
         std = ftm.ft_std(col_data)
         if std == 0:
             standardized_df[col] = 0
@@ -317,15 +316,11 @@ def batch_gradient_descent(thetas: np.ndarray,
       float: New theta value
     """
     new_thetas = thetas.copy()
-    sums = np.zeros(thetas.shape)
-    for i, row in features.iterrows():
-        prediction = hypothesis(thetas, row.values)
-        error = prediction - target[i]
-        for j in range(len(thetas)):
-            sums[j] += error * row.values[j]
-    for j in range(len(thetas)):
-        sums[j] /= len(features)
-        new_thetas[j] -= alpha * sums[j]
+    prediction = np.array([hypothesis(thetas, row)
+                          for row in features.to_numpy()])
+    errors = prediction - target
+    gradient = np.dot(errors, features.to_numpy()) / len(features)
+    new_thetas -= alpha * gradient
     return new_thetas
 
 
@@ -354,16 +349,12 @@ def stochastic_gradient_descent(thetas: np.ndarray,
     merged_df['target'] = target
     shuffled_df = merged_df.sample(frac=1).reset_index(drop=True)
     target = shuffled_df['target'].to_numpy()
-    data = shuffled_df.drop(columns=['target'])
-    new_thetas, tmp_theta = thetas.copy(), {}
-    derivative = np.zeros(thetas.shape)
-    for i, row in data.iterrows():
-        tmp_theta = new_thetas.copy()
-        prediction = hypothesis(tmp_theta, row.values)
-        error = prediction - target[i]
-        for j in range(len(tmp_theta)):
-            derivative[j] = error * row.values[j]
-            new_thetas[j] -= alpha * derivative[j]
+    data = shuffled_df.drop(columns=['target']).to_numpy()
+    new_thetas = thetas.copy()
+    for data_row, target_row in zip(data, target):
+        prediction = hypothesis(new_thetas, data_row)  # Vector
+        errors = prediction - target_row  # Vector
+        new_thetas -= alpha * errors * data_row  # Vector
     return new_thetas
 
 
@@ -393,20 +384,14 @@ def mini_batch_gradient_descent(thetas: np.ndarray,
     merged_df['target'] = target
     shuffled_df = merged_df.sample(frac=1).reset_index(drop=True)
     target = shuffled_df['target'].to_numpy()
-    data = shuffled_df.drop(columns=['target'])
-    new_thetas, tmp_theta = thetas.copy(), {}
-    for i in range(len(data)):
-        sums = np.zeros(thetas.shape)
-        tmp_theta = new_thetas.copy()
-        limit = int(ftm.ft_min([batch_size, len(data) - i]))
-        for _ in range(limit):
-            row = data.iloc[i]
-            prediction = hypothesis(tmp_theta, row)
-            error = prediction - target[i]
-            for j in range(len(thetas)):
-                sums[j] += error * row.values[j]
-            i += 1
-        for j in range(len(tmp_theta)):
-            sums[j] /= limit
-            new_thetas[j] -= alpha * sums[j]
+    data = shuffled_df.drop(columns=['target']).to_numpy()
+    new_thetas = thetas.copy()
+    for start in range(0, len(data), batch_size):
+        end = ftm.ft_min([start + batch_size, len(data)])
+        data_batch = data[start:end]  # Matrix
+        target_batch = target[start:end]  # Vector
+        predictions = np.array([hypothesis(thetas, row) for row in data_batch])
+        errors = predictions - target_batch
+        gradient = np.dot(errors, data_batch) / len(data_batch)
+        new_thetas -= alpha * gradient
     return new_thetas
