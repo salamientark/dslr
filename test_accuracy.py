@@ -14,13 +14,10 @@ def main(ac: int, av: list):
         if ac != 3:
             raise Exception("Usage: python logreg_predict.py "
                             "<dataset_train>.csv <weights.csv>")
-        # if av[1] != "dataset_test.csv":
-        #     raise Exception("dataset_test.csv file name is required as"
-        #                     " the first argument.")
         env_copy = os.environ.copy()
         print("Predicting values...")
         result = subprocess.run([PYTHON_PATH, "logreg_predict.py",
-                                "dataset_train.csv", "thetas.csv"],
+                                av[1], av[2]],
                                 env=env_copy)
         if result.returncode != 0:
             raise Exception("Error while running logreg_predict.py")

@@ -66,7 +66,8 @@ def main(ac: int, av: list):
     """
     try:
         if ac != 2:
-            raise Exception("Usage: python logreg_train.py <dataset_train.csv>")
+            raise Exception("Usage: python logreg_train.py "
+                            "<dataset_train.csv>")
         df = pd.read_csv(av[1])  # Load data
         filtered_df = df[FEATURES + [TARGET]]
         cleaned_df = ftdt.replace_nan(filtered_df, columns=FEATURES)
