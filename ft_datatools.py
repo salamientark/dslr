@@ -166,7 +166,7 @@ def select_columns(df: pd.DataFrame, features: list) -> pd.DataFrame:
 def standardize_array(array,
                       mean: float | None = None,
                       std: float | None = None
-                      ) -> list:
+                      ) -> np.ndarray:
     """Standardize a list of numerical values.
 
     Parameters:
@@ -178,11 +178,10 @@ def standardize_array(array,
     Returns:
     list: Standardized list.
     """
-    standardized = []
     m = mean if mean is not None else ftm.ft_mean(array)
     s = std if std is not None else ftm.ft_std(array)
-    for elem in array:
-        standardized.append((elem - m) / s if s != 0 else 0)
+    standardized = np.array(array.copy())
+    standardized = (standardized - m) / s if s != 0 else np.zeros(len(array))
     return standardized
 
 
