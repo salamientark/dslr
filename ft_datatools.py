@@ -115,7 +115,7 @@ def remove_missing(df: pd.DataFrame, exclude: list[str] = []) -> pd.DataFrame:
     """
     cleaned_df = df.copy()
     subset = [col for col in cleaned_df.columns if col not in exclude]
-    cleaned_df = cleaned_df.dropna(subset=subset, inplace=True)
+    cleaned_df.dropna(subset=subset, inplace=True)
     return cleaned_df
 
 

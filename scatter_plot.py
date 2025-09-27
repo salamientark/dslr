@@ -4,6 +4,11 @@ import ft_datatools as ftdt
 from matplotlib import pyplot as plt
 
 
+# COLORS
+RED = '\033[91m'
+RESET = '\033[0m'
+
+
 def draw_scatter_plot(standardized: dict):
     """Draw unique histogram for each feature in the standardized data matrix.
 
@@ -81,7 +86,7 @@ def main(ac: int, av: list):
         draw_unique_scatter_plot(matrix)
         plt.show()
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"{RED}Error{RESET}: {e}")
 
 
 if __name__ == "__main__":

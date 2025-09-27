@@ -4,6 +4,11 @@ import ft_math as ftm
 import ft_datatools as ftdt
 
 
+# COLORS
+RED = '\033[91m'
+RESET = '\033[0m'
+
+
 def print_result(
         features: list,
         counts: list,
@@ -126,13 +131,12 @@ def main(ac: int, av: list):
         if (ac != 2):
             raise Exception("Usage: describe.py <dataset_path>")
         df = pd.read_csv(av[1])  # Dataframe
-        features = ftdt.get_numerical_features(df)
+        features = ftdt.get_numerical_features(df, exclude=['Index'])
         counts, means, stds, mins, q1s, q2s = [], [], [], [], [], []
         q3s, maxs = [], []
         skewness, kurtosis, variance = [], [], []
         for feature in features:
             col = ftdt.filter_col(df[feature])
-            print(col, ":type:", type(col))
             size = len(col)
             counts.append(size)
             means.append(ftm.ft_mean(col, count=size))
@@ -150,7 +154,7 @@ def main(ac: int, av: list):
         print_result(features, counts, means, stds, mins, q1s, q2s, q3s, maxs,
                      variance, skewness, kurtosis)
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"{RED}Error{RESET}: {e}")
 
 
 if __name__ == "__main__":

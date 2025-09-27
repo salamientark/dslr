@@ -4,6 +4,11 @@ import ft_datatools as ftdt
 from matplotlib import pyplot as plt
 
 
+# COLORS
+RED = '\033[91m'
+RESET = '\033[0m'
+
+
 def draw_merged_histogram(standardized: dict):
     """Draw merged histogram from each feature in the standardized data matrix.
 
@@ -70,7 +75,7 @@ def main(ac: int, av: list):
         draw_merged_histogram(standardized)
         plt.show()
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"{RED}Error{RESET}: {e}")
 
 
 if __name__ == "__main__":
